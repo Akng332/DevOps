@@ -1,0 +1,30 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# Node.js
+node_modules/
+
+# Окружение
+.env
+.env.local
+.env.*.local
+
+# Сборка
+dist/
+build/
+
+# Логи
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
