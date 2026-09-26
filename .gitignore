@@ -28,3 +28,9 @@ build/
 # OS
 .DS_Store
 Thumbs.db
+
+# SQLite база
+*.db
+*.db-shm
+*.db-wal
+musicstore.db
