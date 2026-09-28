@@ -23,8 +23,8 @@ public class JwtTokenService
         var claims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username), // Используем Username вместо Email
-            new Claim(ClaimTypes.Role, user.Role)      // Добавляем роль (у вас в модели есть Role)
+            new Claim(ClaimTypes.Name, user.Username), // ИСПРАВЛЕНО: используем Username
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
         var token = new JwtSecurityToken(
