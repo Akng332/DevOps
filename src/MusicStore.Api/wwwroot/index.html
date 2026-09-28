@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicStore - Авторизация</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Блок с формами (показывается, если нет токена) -->
+        <div id="auth-section">
+            <h1>MusicStore</h1>
+            
+            <div class="tabs">
+                <button id="tab-login" class="active" onclick="switchTab('login')">Вход</button>
+                <button id="tab-register" onclick="switchTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Форма входа -->
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <h2>Вход в систему</h2>
+                <input type="text" id="login-username" placeholder="Логин" required>
+                <input type="password" id="login-password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+                <p id="login-error" class="error"></p>
+            </form>
+
+            <!-- Форма регистрации -->
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <h2>Регистрация</h2>
+                <input type="text" id="register-username" placeholder="Придумайте логин" required>
+                <input type="password" id="register-password" placeholder="Придумайте пароль" required>
+                <button type="submit">Зарегистрироваться</button>
+                <p id="register-error" class="error"></p>
+            </form>
+        </div>
+
+        <!-- Блок профиля (показывается, если пользователь вошел) -->
+        <div id="profile-section" class="hidden">
+            <h2>Личный кабинет</h2>
+            <div class="profile-info">
+                <p><strong>ID:</strong> <span id="profile-id"></span></p>
+                <p><strong>Логин:</strong> <span id="profile-username"></span></p>
+                <p><strong>Роль:</strong> <span id="profile-role"></span></p>
+                <p><strong>Дата регистрации:</strong> <span id="profile-created"></span></p>
+            </div>
+            <button onclick="handleLogout()" class="logout-btn">Выйти</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

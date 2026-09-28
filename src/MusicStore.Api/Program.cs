@@ -61,7 +61,8 @@ app.UseExceptionHandler(errorApp =>
 
 app.UseHttpsRedirection();
 
-// ВАЖНО: Порядок middleware! Сначала аутентификация, потом авторизация.
+app.UseDefaultFiles();
+app.UseStaticFiles(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
