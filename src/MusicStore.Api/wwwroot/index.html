@@ -3,50 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicStore - Авторизация</title>
+    <title>MusicStore</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <!-- Блок с формами (показывается, если нет токена) -->
-        <div id="auth-section">
-            <h1>MusicStore</h1>
-            
-            <div class="tabs">
-                <button id="tab-login" class="active" onclick="switchTab('login')">Вход</button>
-                <button id="tab-register" onclick="switchTab('register')">Регистрация</button>
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showPage('catalog')">🎵 MusicStore</a>
+            <nav class="nav-links">
+                <a href="#" onclick="showPage('catalog')">Каталог</a>
+                <span id="nav-auth">
+                    <a href="#" onclick="showPage('auth')" id="nav-login-btn">Войти</a>
+                </span>
+                <span id="nav-profile" class="hidden">
+                    <a href="#" onclick="showPage('profile')" id="nav-profile-btn">Профиль</a>
+                    <a href="#" onclick="handleLogout()" class="nav-logout">Выйти</a>
+                </span>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-container">
+
+        <section id="page-catalog" class="page">
+            <div class="page-header">
+                <h1>Каталог альбомов</h1>
+                <button id="add-disc-btn" class="hidden btn-primary" onclick="openModal()">+ Добавить альбом</button>
             </div>
+            <p class="subtitle">Выберите альбом, чтобы добавить его в корзину. Редактирование доступно только администратору.</p>
+            <div id="catalog-grid" class="catalog-grid"></div>
+        </section>
 
-            <!-- Форма входа -->
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <h2>Вход в систему</h2>
-                <input type="text" id="login-username" placeholder="Логин" required>
-                <input type="password" id="login-password" placeholder="Пароль" required>
-                <button type="submit">Войти</button>
-                <p id="login-error" class="error"></p>
-            </form>
+        <section id="page-auth" class="page hidden">
+            <div class="auth-wrapper">
+                <button class="back-btn" onclick="showPage('catalog')">← Назад к каталогу</button>
+                <div class="container">
+                    <h1>MusicStore</h1>
+                    <div class="tabs">
+                        <button id="tab-login" class="active" onclick="switchTab('login')">Вход</button>
+                        <button id="tab-register" onclick="switchTab('register')">Регистрация</button>
+                    </div>
+                    <form id="login-form" onsubmit="handleLogin(event)">
+                        <input type="text" id="login-username" placeholder="Логин" required>
+                        <input type="password" id="login-password" placeholder="Пароль" required>
+                        <button type="submit">Войти</button>
+                        <p id="login-error" class="error"></p>
+                    </form>
+                    <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                        <input type="text" id="register-username" placeholder="Придумайте логин" required>
+                        <input type="password" id="register-password" placeholder="Придумайте пароль" required>
+                        <button type="submit">Зарегистрироваться</button>
+                        <p id="register-error" class="error"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
 
-            <!-- Форма регистрации -->
-            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
-                <h2>Регистрация</h2>
-                <input type="text" id="register-username" placeholder="Придумайте логин" required>
-                <input type="password" id="register-password" placeholder="Придумайте пароль" required>
-                <button type="submit">Зарегистрироваться</button>
-                <p id="register-error" class="error"></p>
-            </form>
+<section id="page-profile" class="page hidden">
+    <button class="back-btn" onclick="showPage('catalog')">← Назад к каталогу</button>
+    <div class="container">
+        <h2>Личный кабинет</h2>
+        <div class="profile-info">
+            <p><strong>ID:</strong> <span id="profile-id"></span></p>
+            <p><strong>Логин:</strong> <span id="profile-username"></span></p>
+            <p><strong>Роль:</strong> <span id="profile-role"></span></p>
+            <p><strong>Дата регистрации:</strong> <span id="profile-created"></span></p>
         </div>
 
-        <!-- Блок профиля (показывается, если пользователь вошел) -->
-        <div id="profile-section" class="hidden">
-            <h2>Личный кабинет</h2>
-            <div class="profile-info">
-                <p><strong>ID:</strong> <span id="profile-id"></span></p>
-                <p><strong>Логин:</strong> <span id="profile-username"></span></p>
-                <p><strong>Роль:</strong> <span id="profile-role"></span></p>
-                <p><strong>Дата регистрации:</strong> <span id="profile-created"></span></p>
+        <div class="cart-info">
+            <h3>🛒 Корзина</h3>
+            <div id="cart-list">Корзина пуста</div>
+            <p style="margin-top:10px;">Итого: <strong id="cart-total">0</strong> ₽</p>
+            <div class="modal-buttons" style="margin-top:10px;">
+                <button onclick="checkout()" class="btn-primary">Оформить покупку</button>
+                <button onclick="clearCart()" class="btn-secondary">Очистить</button>
             </div>
-            <button onclick="handleLogout()" class="logout-btn">Выйти</button>
+        </div>
+
+        <div class="cart-info" style="background:#e3f2fd; border-left-color:#1976d2;">
+            <h3>📦 История покупок</h3>
+            <div id="sales-list">Загрузка...</div>
+        </div>
+
+        <button onclick="handleLogout()" class="logout-btn">Выйти из аккаунта</button>
+    </div>
+</section>
+
+    </main>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">Добавить альбом</h3>
+            <input type="text" id="disc-title" placeholder="Название альбома">
+            <input type="text" id="disc-author" placeholder="Автор (Музыкант)">
+            <input type="text" id="disc-image" placeholder="URL обложки (ссылка на картинку)">
+            <input type="number" id="disc-price" placeholder="Цена (₽)">
+            <div class="modal-buttons">
+                <button onclick="saveDisc()" class="btn-primary">Сохранить</button>
+                <button onclick="closeModal()" class="btn-secondary">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-content detail-content">
+            <button class="close-detail" onclick="closeDetail()">✕</button>
+            <img id="detail-image" class="detail-image" src="" alt="">
+            <h2 id="detail-title"></h2>
+            <p id="detail-author" class="detail-author"></p>
+            <div id="detail-price" class="detail-price"></div>
+            <div id="detail-actions" class="detail-actions"></div>
         </div>
     </div>
 

@@ -44,8 +44,8 @@ public class AppDbContext : DbContext
             .Property(d => d.Price)
             .HasPrecision(10, 2);
 
-        modelBuilder.Entity<Sale>()
-            .Property(s => s.SalePrice)
+       modelBuilder.Entity<Sale>()
+            .Property(s => s.TotalAmount)
             .HasPrecision(10, 2);
-    }
+        }
 }

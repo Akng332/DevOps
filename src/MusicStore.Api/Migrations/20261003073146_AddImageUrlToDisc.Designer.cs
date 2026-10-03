@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicStore.Api.Data;
 
@@ -10,9 +11,11 @@ using MusicStore.Api.Data;
 namespace MusicStore.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003073146_AddImageUrlToDisc")]
+    partial class AddImageUrlToDisc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
@@ -61,9 +64,6 @@ namespace MusicStore.Api.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(10, 2)
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -135,7 +135,7 @@ namespace MusicStore.Api.Migrations
                     b.Property<DateTime>("SaleDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<decimal>("TotalAmount")
+                    b.Property<decimal>("SalePrice")
                         .HasPrecision(10, 2)
                         .HasColumnType("TEXT");
 
