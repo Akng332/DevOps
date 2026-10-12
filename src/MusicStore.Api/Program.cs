@@ -13,9 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 2. Подключение к БД (SQLite)
+// 2. Подключение к PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 // 3. Регистрируем наши кастомные сервисы
 builder.Services.AddScoped<PasswordHasher>();
@@ -23,6 +23,8 @@ builder.Services.AddScoped<JwtTokenService>();
 
 // 4. Настройка JWT аутентификации
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key is missing");
+if (Encoding.UTF8.GetByteCount(jwtKey) < 32)
+    throw new InvalidOperationException("JWT Key must contain at least 32 bytes");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -47,11 +49,13 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
     
-    // Применяем миграции (на всякий случай)
-    await db.Database.MigrateAsync();
-    
-    // Заполняем данными
-    await DbSeeder.SeedAsync(db, hasher);
+    // Схема создаётся отдельно с учётной записью для миграций.
+    // При запуске приложения используются только права runtime-пользователя.
+    await DbSeeder.SeedAsync(
+        db,
+        hasher,
+        builder.Configuration["BootstrapAdmin:Username"],
+        builder.Configuration["BootstrapAdmin:Password"]);
 }
 if (app.Environment.IsDevelopment())
 {
