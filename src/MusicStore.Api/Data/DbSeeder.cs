@@ -6,18 +6,28 @@ namespace MusicStore.Api.Data;
 
 public static class DbSeeder
 {
-    public static async Task SeedAsync(AppDbContext context, PasswordHasher hasher)
+    public static async Task SeedAsync(
+        AppDbContext context,
+        PasswordHasher hasher,
+        string? adminUsername,
+        string? adminPassword)
     {
-        if (!await context.Users.AnyAsync(u => u.Username == "ad1"))
+        if (!string.IsNullOrWhiteSpace(adminUsername) && !string.IsNullOrWhiteSpace(adminPassword))
         {
-            context.Users.Add(new User
+            if (adminPassword.Length < 16)
+                throw new InvalidOperationException("Bootstrap admin password must contain at least 16 characters");
+
+            if (!await context.Users.AnyAsync(u => u.Username == adminUsername))
             {
-                Username = "ad1",
-                PasswordHash = hasher.Hash("ad1"),
-                Role = "admin",
-                CreatedAt = DateTime.UtcNow
-            });
-            await context.SaveChangesAsync();
+                context.Users.Add(new User
+                {
+                    Username = adminUsername,
+                    PasswordHash = hasher.Hash(adminPassword),
+                    Role = "admin",
+                    CreatedAt = DateTime.UtcNow
+                });
+                await context.SaveChangesAsync();
+            }
         }
 
         if (!await context.Discs.AnyAsync())

@@ -35,7 +35,7 @@ public class AuthController : ControllerBase
         {
             Username = request.Username,
             PasswordHash = _passwordHasher.Hash(request.Password)
-            // Role установится по умолчанию "manager" из вашей модели
+            // Новые пользователи получают роль "user" из модели.
         };
 
         _context.Users.Add(user);
