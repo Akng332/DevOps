@@ -1,0 +1,25 @@
+[Unit]
+Description=MusicStore API (.NET)
+Documentation=https://github.com/Akng332/DevOps
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=musicstore
+Group=musicstore
+WorkingDirectory=/opt/musicstore
+EnvironmentFile=/etc/musicstore/musicstore.env
+ExecStart=/usr/bin/dotnet /opt/musicstore/MusicStore.Api.dll
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/musicstore
+KillSignal=SIGINT
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target
