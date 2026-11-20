@@ -2,7 +2,7 @@ DOTNET ?= dotnet
 SOLUTION := MusicStore.sln
 BACKUP_FILE ?= backups/musicstore.dump
 
-.PHONY: setup run format test sast db-check verify migrate backup restore
+.PHONY: setup run format test sast db-check verify migrate backup restore container-setup container-up container-check container-down
 
 setup:
 	$(DOTNET) restore $(SOLUTION)
@@ -34,3 +34,15 @@ backup:
 
 restore:
 	bash scripts/restore.sh $(BACKUP_FILE)
+
+container-setup:
+	bash scripts/container-setup.sh
+
+container-up:
+	docker compose -p musicstore-lab4 up -d --build db migrator app
+
+container-check:
+	bash scripts/container-check.sh
+
+container-down:
+	docker compose -p musicstore-lab4 down
