@@ -48,7 +48,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
-    
+
     // Схема создаётся отдельно с учётной записью для миграций.
     // При запуске приложения используются только права runtime-пользователя.
     await DbSeeder.SeedAsync(
@@ -84,7 +84,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 app.UseDefaultFiles();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 

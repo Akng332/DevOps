@@ -25,22 +25,37 @@ public class SalesController : ControllerBase
         if (items == null || items.Count == 0)
             return BadRequest("Корзина пуста.");
 
+        if (items.Any(item => item.Quantity <= 0 || item.DiscId <= 0))
+            return BadRequest("Количество товара и идентификатор диска должны быть положительными.");
+
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
             return Unauthorized();
 
+        var requestedItems = items.GroupBy(item => item.DiscId)
+            .Select(group => new CheckoutItem
+            {
+                DiscId = group.Key,
+                Quantity = checked(group.Sum(item => item.Quantity))
+            }).ToList();
+
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var sales = new List<Sale>();
         decimal totalSum = 0;
 
-        foreach (var item in items)
+        foreach (var item in requestedItems)
         {
-            var disc = await _context.Discs.FindAsync(item.DiscId);
-            if (disc == null) continue;
+            var disc = await _context.Discs.AsNoTracking()
+                .FirstOrDefaultAsync(d => d.Id == item.DiscId);
+            if (disc == null)
+                return BadRequest($"Диск с ID {item.DiscId} не найден.");
 
-            if (disc.Quantity < item.Quantity)
+            var updated = await _context.Discs
+                .Where(d => d.Id == item.DiscId && d.Quantity >= item.Quantity)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(
+                    d => d.Quantity, d => d.Quantity - item.Quantity));
+            if (updated == 0)
                 return BadRequest($"Недостаточно товара «{disc.Title}» на складе. Осталось: {disc.Quantity}.");
-
-            disc.Quantity -= item.Quantity;
 
             var sale = new Sale
             {
@@ -56,6 +71,7 @@ public class SalesController : ControllerBase
 
         _context.Sales.AddRange(sales);
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return Ok(new { message = "Покупка успешно оформлена", total = totalSum, count = sales.Count });
     }

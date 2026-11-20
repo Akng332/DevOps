@@ -27,6 +27,9 @@ virtualbox-machines/
 # IDE
 .vscode/
 .idea/
+.venv/
+coverage.*
+backups/
 
 # OS
 .DS_Store
