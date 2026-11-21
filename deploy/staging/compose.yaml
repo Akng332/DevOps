@@ -55,7 +55,7 @@ services:
     secrets: [app_db_password, jwt_key]
     ports:
       - "192.168.56.10:18080:8080"
-    networks: [backend]
+    networks: [backend, frontend]
     healthcheck:
       test: ["CMD", "dotnet", "MusicStore.Api.dll", "--healthcheck"]
       interval: 10s
@@ -71,6 +71,7 @@ services:
 networks:
   backend:
     internal: true
+  frontend:
 
 volumes:
   db_data:
