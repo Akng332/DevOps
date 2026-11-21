@@ -1,0 +1,9 @@
+# Repository settings must require code owner review for the target branch.
+/.github/CODEOWNERS @Akng332
+/.github/workflows/ @Akng332
+/Makefile @Akng332
+/tests/ @Akng332
+/requirements-dev.txt @Akng332
+/scripts/check-db.sh @Akng332
+/scripts/container-check.sh @Akng332
+/scripts/check-compose.py @Akng332
