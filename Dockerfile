@@ -11,6 +11,8 @@ RUN dotnet publish src/MusicStore.Api/MusicStore.Api.csproj \
     -p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0.15-noble
+ARG VCS_REF=dev
+ENV APP_VERSION=${VCS_REF}
 WORKDIR /app
 COPY --from=build --chown=1000:1000 /publish/ ./
 

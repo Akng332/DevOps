@@ -128,5 +128,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/version", () => Results.Ok(new
+{
+    version = Environment.GetEnvironmentVariable("APP_VERSION") ?? "dev"
+}));
 
 app.Run();

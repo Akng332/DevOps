@@ -1,0 +1,84 @@
+name: musicstore-staging
+
+services:
+  db:
+    image: postgres:17.12-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: musicstore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      APP_DB_PASSWORD_FILE: /run/secrets/app_db_password
+    secrets: [postgres_password, app_db_password]
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./database/container-init:/docker-entrypoint-initdb.d:ro
+    networks: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d musicstore"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  migrator:
+    image: postgres:17.12-bookworm
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://postgres@db:5432/musicstore
+    secrets: [postgres_password]
+    volumes:
+      - ./database/migrations:/database/migrations:ro
+      - ./scripts/migrate.sh:/scripts/migrate.sh:ro
+      - ./scripts/container-migrate.sh:/scripts/container-migrate.sh:ro
+    networks: [backend]
+    entrypoint: ["bash", "/scripts/container-migrate.sh"]
+    restart: "no"
+
+  app:
+    image: ${IMAGE_REF:?Set IMAGE_REF to a published SHA tag}
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    user: "1000:1000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__Default: Host=db;Port=5432;Database=musicstore;Username=musicstore_app
+      DbPasswordFile: /run/secrets/app_db_password
+      JwtKeyFile: /run/secrets/jwt_key
+      Jwt__Issuer: MusicStoreApi
+      Jwt__Audience: MusicStoreClient
+      Jwt__ExpiresInHours: "24"
+    secrets: [app_db_password, jwt_key]
+    ports:
+      - "192.168.56.10:18080:8080"
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "dotnet", "MusicStore.Api.dll", "--healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+networks:
+  backend:
+    internal: true
+
+volumes:
+  db_data:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password
+  app_db_password:
+    file: ./secrets/app_db_password
+  jwt_key:
+    file: ./secrets/jwt_key

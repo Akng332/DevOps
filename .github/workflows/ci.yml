@@ -173,3 +173,4 @@ jobs:
           push: true
           tags: ${{ steps.image.outputs.name }}
           labels: org.opencontainers.image.revision=${{ github.sha }}
+          build-args: VCS_REF=${{ github.sha }}
