@@ -9,12 +9,9 @@ for name in postgres_password app_db_password jwt_key; do
     if [[ ! -s "secrets/$name" ]]; then
         openssl rand -hex 32 > "secrets/$name"
     fi
-    if [[ "$name" == app_db_password ]]; then
-        # The PostgreSQL init script runs as a different UID. The enclosing
-        # secrets directory remains private to the host user.
-        chmod 644 "secrets/$name"
-    else
-        chmod 600 "secrets/$name"
-    fi
+    # Compose bind-mounts each secret into containers with different UIDs.
+    # The host directory is private; only services explicitly mounting a
+    # given file receive it.
+    chmod 644 "secrets/$name"
 done
 echo 'Container secrets and backup directory are ready'

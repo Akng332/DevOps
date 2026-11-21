@@ -29,7 +29,6 @@ services:
 
   migrator:
     image: postgres:17.12-bookworm
-    user: "1000:1000"
     depends_on:
       db:
         condition: service_healthy
@@ -100,7 +99,6 @@ services:
   db-tools:
     profiles: ["tools"]
     image: postgres:17.12-bookworm
-    user: "1000:1000"
     depends_on:
       db:
         condition: service_healthy
