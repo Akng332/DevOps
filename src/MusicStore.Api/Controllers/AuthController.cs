@@ -42,12 +42,12 @@ public class AuthController : ControllerBase
         await _context.SaveChangesAsync();
 
         var token = _jwtTokenService.GenerateToken(user);
-        
-        return Ok(new AuthResponseDto 
-        { 
-            Token = token, 
-            Username = user.Username, 
-            Role = user.Role 
+
+        return Ok(new AuthResponseDto
+        {
+            Token = token,
+            Username = user.Username,
+            Role = user.Role
         });
     }
 
@@ -55,17 +55,17 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<AuthResponseDto>> Login(LoginDto request)
     {
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
-        
+
         if (user == null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
             return Unauthorized("Неверный логин или пароль.");
 
         var token = _jwtTokenService.GenerateToken(user);
-        
-        return Ok(new AuthResponseDto 
-        { 
-            Token = token, 
-            Username = user.Username, 
-            Role = user.Role 
+
+        return Ok(new AuthResponseDto
+        {
+            Token = token,
+            Username = user.Username,
+            Role = user.Role
         });
     }
 
@@ -75,21 +75,21 @@ public class AuthController : ControllerBase
     {
         // Достаем ID пользователя из токена
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
+
         if (string.IsNullOrEmpty(userIdString) || !int.TryParse(userIdString, out int userId))
             return Unauthorized();
 
         var user = await _context.Users.FindAsync(userId);
-        
-        if (user == null) 
+
+        if (user == null)
             return NotFound();
 
-        return Ok(new 
-        { 
-            user.Id, 
-            user.Username, 
-            user.Role, 
-            user.CreatedAt 
+        return Ok(new
+        {
+            user.Id,
+            user.Username,
+            user.Role,
+            user.CreatedAt
         });
     }
 }

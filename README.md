@@ -2,9 +2,11 @@
 
 MusicStore — ASP.NET Core API и веб-интерфейс для учёта музыкантов, произведений, дисков, продаж и остатков. Приложение использует PostgreSQL и токены JWT.
 
+Контейнерный запуск и проверка для ЛР 4 описаны в [docs/lab4.md](docs/lab4.md).
+
 ## Требования
 
-- .NET SDK 10.x.
+- .NET SDK 10.0.404 (см. `global.json`).
 - PostgreSQL 17.x (локально или на отдельном сервере).
 - `psql` для создания базы и применения схемы.
 - Git для получения исходного кода.
@@ -39,7 +41,8 @@ CREATE DATABASE musicstore OWNER musicstore_migrator;
 Команда `\password` интерактивно задаст пароль роли. Не вставляйте пароль в SQL-команду или историю терминала. Из корня репозитория примените начальную схему:
 
 ```powershell
-psql -U postgres -d musicstore -f .\database\postgresql-schema.sql
+$env:MIGRATION_DATABASE_URL = "postgresql://postgres@localhost:5432/musicstore"
+& "C:\Program Files\Git\bin\bash.exe" scripts/migrate.sh
 ```
 
 Затем откройте базу от имени администратора `postgres` и выдайте приложению права на подключение и работу с данными:
@@ -61,7 +64,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE musicstore_migrator IN SCHEMA public
 \q
 ```
 
-Скрипт схемы находится в [database/postgresql-schema.sql](./database/postgresql-schema.sql). Описание дальнейшего сопровождения схемы — в [database/README.md](./database/README.md). Приложение не создаёт и не мигрирует таблицы автоматически при запуске.
+Порядок версий и обновления существующей базы описан в [database/README.md](./database/README.md). Приложение не меняет таблицы автоматически при запуске. Для ЛР 3 добавлены [проверки и резервное копирование](./docs/lab3.md).
 
 ## Настроить приложение
 
@@ -124,7 +127,7 @@ Invoke-RestMethod http://localhost:5058/api/health
 Invoke-RestMethod http://localhost:5058/api/discs
 ```
 
-В текущем solution отдельный тестовый проект пока не добавлен, поэтому `dotnet test` не запускает тестовые кейсы.
+Тестовый проект находится в `tests/MusicStore.Tests`. Он использует отдельную базу SQLite в памяти. Команды проверки PostgreSQL и восстановления описаны в [ЛР 3](./docs/lab3.md).
 
 ## Опубликовать приложение
 

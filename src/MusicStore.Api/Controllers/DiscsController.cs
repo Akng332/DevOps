@@ -31,6 +31,26 @@ public class DiscsController : ControllerBase
                 ImageUrl = d.ImageUrl,
                 Price = d.Price,
                 Quantity = d.Quantity,
+                ReorderThreshold = d.ReorderThreshold,
+                AuthorName = d.Musician != null ? d.Musician.Name : "Неизвестен"
+            })
+            .ToListAsync();
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpGet("low-stock")]
+    public async Task<ActionResult<IEnumerable<DiscDto>>> GetLowStock()
+    {
+        return await _context.Discs
+            .Where(d => d.Quantity <= d.ReorderThreshold)
+            .Select(d => new DiscDto
+            {
+                Id = d.Id,
+                Title = d.Title,
+                ImageUrl = d.ImageUrl,
+                Price = d.Price,
+                Quantity = d.Quantity,
+                ReorderThreshold = d.ReorderThreshold,
                 AuthorName = d.Musician != null ? d.Musician.Name : "Неизвестен"
             })
             .ToListAsync();
@@ -53,6 +73,7 @@ public class DiscsController : ControllerBase
             ImageUrl = disc.ImageUrl,
             Price = disc.Price,
             Quantity = disc.Quantity,
+            ReorderThreshold = disc.ReorderThreshold,
             AuthorName = disc.Musician != null ? disc.Musician.Name : "Неизвестен"
         };
     }
@@ -61,6 +82,10 @@ public class DiscsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] DiscDto request)
     {
+        if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.AuthorName) ||
+            request.Price <= 0 || request.Quantity < 0 || request.ReorderThreshold < 0)
+            return BadRequest("Проверьте название, автора, цену, количество и порог остатка.");
+
         var musician = await _context.Musicians.FirstOrDefaultAsync(m => m.Name == request.AuthorName);
         if (musician == null)
         {
@@ -79,6 +104,7 @@ public class DiscsController : ControllerBase
             ImageUrl = request.ImageUrl,
             Price = request.Price,
             Quantity = request.Quantity,
+            ReorderThreshold = request.ReorderThreshold,
             MusicianId = musician.Id,
             CompositionId = composition.Id
         };
@@ -93,6 +119,7 @@ public class DiscsController : ControllerBase
             ImageUrl = disc.ImageUrl,
             Price = disc.Price,
             Quantity = disc.Quantity,
+            ReorderThreshold = disc.ReorderThreshold,
             AuthorName = musician.Name
         });
     }
@@ -101,6 +128,10 @@ public class DiscsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] DiscDto request)
     {
+        if (string.IsNullOrWhiteSpace(request.Title) || string.IsNullOrWhiteSpace(request.AuthorName) ||
+            request.Price <= 0 || request.Quantity < 0 || request.ReorderThreshold < 0)
+            return BadRequest("Проверьте название, автора, цену, количество и порог остатка.");
+
         var disc = await _context.Discs
             .Include(d => d.Musician)
             .FirstOrDefaultAsync(d => d.Id == id);
@@ -111,6 +142,7 @@ public class DiscsController : ControllerBase
         disc.ImageUrl = request.ImageUrl;
         disc.Price = request.Price;
         disc.Quantity = request.Quantity;
+        disc.ReorderThreshold = request.ReorderThreshold;
 
         if (disc.Musician != null && disc.Musician.Name != request.AuthorName)
         {
@@ -133,6 +165,7 @@ public class DiscsController : ControllerBase
             ImageUrl = disc.ImageUrl,
             Price = disc.Price,
             Quantity = disc.Quantity,
+            ReorderThreshold = disc.ReorderThreshold,
             AuthorName = request.AuthorName
         });
     }

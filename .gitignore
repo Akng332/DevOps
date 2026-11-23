@@ -27,6 +27,10 @@ virtualbox-machines/
 # IDE
 .vscode/
 .idea/
+.venv/
+coverage.*
+backups/
+secrets/
 
 # OS
 .DS_Store
