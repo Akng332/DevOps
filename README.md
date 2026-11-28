@@ -4,6 +4,8 @@ MusicStore — ASP.NET Core API и веб-интерфейс для учёта �
 
 Полное руководство для пользователей и операторов: [docs/USER_GUIDE.md](docs/USER_GUIDE.md).
 
+Развёртывание проекта с нуля на новом компьютере: [docs/NEW_DEVICE_SETUP.md](docs/NEW_DEVICE_SETUP.md).
+
 Контейнерный запуск и проверка для ЛР 4 описаны в [docs/lab4.md](docs/lab4.md).
 
 ## Требования
